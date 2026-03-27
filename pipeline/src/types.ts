@@ -39,6 +39,8 @@ export interface UserArchetype {
   categories: Record<string, CategoryProfile>;
 }
 
+export type AnonymizedTransaction = Omit<Transaction, "counterparty">;
+
 export interface GeneratorBatch {
   year: number;
   month: number;

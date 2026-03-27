@@ -6,5 +6,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "apache-arrow": "^18.0.0",
+    "@aws-sdk/client-s3": "^3.0.0",
+    "parquet-wasm": "^0.6.0"
   }
 }

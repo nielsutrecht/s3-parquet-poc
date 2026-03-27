@@ -1,4 +1,6 @@
+import { anonymize } from "./anonymizer.js";
 import { DEFAULT_CONFIG, generateTransactions } from "./generator.js";
+import { writeBatch } from "./writer.js";
 
 async function main(): Promise<void> {
   const config = DEFAULT_CONFIG;
@@ -17,8 +19,8 @@ async function main(): Promise<void> {
     console.log(
       `  Batch ${batchCount}/24: ${batch.year}-${String(batch.month).padStart(2, "0")} — ${batch.transactions.length.toLocaleString()} transactions`
     );
-    // TODO DEV-40: anonymize(batch.transactions)
-    // TODO DEV-41: writeParquet(batch)
+    const anonymized = batch.transactions.map(anonymize);
+    await writeBatch({ year: batch.year, month: batch.month, transactions: anonymized });
   }
 
   console.log(

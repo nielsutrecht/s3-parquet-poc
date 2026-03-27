@@ -1,11 +1,4 @@
-// DuckDB query script — runs sample queries against Parquet files on S3.
-// See DEV-36 for the full queries spec.
-
-async function main(): Promise<void> {
-  console.log("DuckDB queries not yet implemented.");
-}
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// DuckDB queries are implemented in Python — see queries/duckdb.py.
+//
+// Usage:
+//   BUCKET_NAME=<bucket> python queries/duckdb.py
