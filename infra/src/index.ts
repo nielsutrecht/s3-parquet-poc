@@ -50,7 +50,8 @@ new aws.glue.CatalogTable("transactions", {
     "projection.enabled": "true",
     "projection.year.type": "integer",
     "projection.year.range": "2024,2030",
-    "projection.month.type": "injected",
+    "projection.month.type": "enum",
+    "projection.month.values": "01,02,03,04,05,06,07,08,09,10,11,12",
     "storage.location.template": pulumi.interpolate`s3://${bucket.id}/transactions/year=\${year}/month=\${month}`,
     // Parquet
     "classification": "parquet",

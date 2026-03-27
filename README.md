@@ -67,6 +67,74 @@ node pipeline/dist/index.js
 Default config: 100 users × 10 accounts × ~85 tx/account/month × 24 months ≈ 2M rows.
 Full-scale run (~20M rows) requires bumping `transactionsPerAccountPerMonth` to ~850 in `pipeline/src/generator.ts`.
 
+## Athena queries
+
+The four sample queries live in `queries/athena/` as standalone `.sql` files. Run them in the Athena console (workgroup: `s3-parquet-poc`) or via the AWS CLI.
+
+### Glue table
+
+- Database: `s3_parquet_poc`, Table: `transactions`
+- Partition projection on `year` (integer, 2024–2030) and `month` (enum, `01–12`)
+- No `MSCK REPAIR TABLE` needed — partition projection handles discovery automatically
+
+### The four queries
+
+**`01_distinct_users.sql` — distinct users**
+
+```sql
+SELECT COUNT(DISTINCT user_id) AS distinct_users
+FROM "s3_parquet_poc"."transactions";
+```
+
+Expected with default config (`numUsers=100`): `100`.
+
+**`02_accounts_per_user.sql` — accounts per user**
+
+```sql
+SELECT user_id, COUNT(DISTINCT account_id) AS num_accounts
+FROM "s3_parquet_poc"."transactions"
+GROUP BY user_id
+ORDER BY num_accounts DESC;
+```
+
+Expected with default config (`accountsPerUser=10`): every user has `10` accounts.
+
+**`03_amount_stats.sql` — overall amount statistics**
+
+```sql
+SELECT
+    MIN(amount) AS min_amount,
+    MAX(amount) AS max_amount,
+    AVG(amount) AS avg_amount
+FROM "s3_parquet_poc"."transactions";
+```
+
+`amount` sign convention: positive = credit (salary), negative = debit (spend).
+
+**`04_amount_stats_by_month.sql` — amount statistics per month**
+
+```sql
+SELECT year, month,
+    MIN(amount) AS min_amount,
+    MAX(amount) AS max_amount,
+    AVG(amount) AS avg_amount
+FROM "s3_parquet_poc"."transactions"
+GROUP BY year, month
+ORDER BY year ASC, month ASC;
+```
+
+Returns exactly 24 rows for Jan 2024 – Dec 2025 data.
+
+### Running via AWS CLI
+
+```bash
+aws athena start-query-execution \
+  --work-group s3-parquet-poc \
+  --query-string "$(cat queries/athena/01_distinct_users.sql)"
+```
+
+Results are written to `s3://<bucket>/athena-results/` and retrievable with `aws athena get-query-results`.
+
 ## DuckDB queries
 
 `queries/duckdb.py` reads the Parquet partitions directly from S3 using DuckDB's `httpfs` extension — no Athena, no Glue, no local download required.
