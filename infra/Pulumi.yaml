@@ -1,0 +1,6 @@
+name: s3-parquet-poc
+runtime:
+  name: nodejs
+  options:
+    typescript: true
+description: S3 Parquet PoC — AWS infrastructure (S3, Glue, Athena)

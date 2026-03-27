@@ -1,0 +1,14 @@
+{
+  "name": "@s3-parquet-poc/infra",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@pulumi/aws": "^6.0.0",
+    "@pulumi/pulumi": "^3.0.0"
+  }
+}
