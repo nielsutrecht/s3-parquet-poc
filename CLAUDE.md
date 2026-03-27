@@ -10,7 +10,7 @@ TypeScript monorepo — synthetic bank transaction pipeline writing Parquet to S
 |---|---|
 | `infra/` | Pulumi TypeScript — S3, Glue, Athena |
 | `pipeline/` | Generate → anonymize → write Parquet to S3 |
-| `queries/` | Athena SQL files + DuckDB local query script |
+| `queries/` | Athena SQL files + `duckdb.py` (Python, reads S3 directly) |
 
 ## Commands
 
@@ -50,9 +50,11 @@ generateTransactions(config)   →  AsyncGenerator<{ year, month, transactions }
   └─ accounts pre-generated at startup — stable across all months
 ```
 
-Anonymizer (DEV-40): remove `counterparty`, SHA-256 hash `user_id` / `account_id` / `iban`.
+Anonymizer: remove `counterparty`, SHA-256 hash `user_id` / `account_id` / `iban`.
 
-Parquet writer (DEV-41): write each batch to `s3://<bucket>/transactions/year=YYYY/month=MM/`.
+Parquet writer: write each batch to `s3://<bucket>/transactions/year=YYYY/month=MM/` using `parquet-wasm` + `apache-arrow` (IPC stream as interchange), Snappy compression.
+
+DuckDB (`queries/duckdb.py`): in-memory connection, `httpfs` + credential chain, glob pattern covers all 24 partitions. Run with `BUCKET_NAME=<bucket> python queries/duckdb.py`. Requires `pip install -r queries/requirements.txt`.
 
 ## Glue table
 
