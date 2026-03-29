@@ -68,3 +68,5 @@ DuckDB (`queries/duckdb.py`): in-memory connection, `httpfs` + credential chain,
 Issues tracked in Linear (project: DEV-36 — S3 Parquet PoC).
 Changes use the openspec spec-driven workflow (`openspec/`).
 After archiving a change, always mark the corresponding Linear issue as Done.
+
+**Always use `/opsx:explore` or `/opsx:propose` before making any code changes.** Never edit files directly without first going through the openspec workflow to align on design and tasks.

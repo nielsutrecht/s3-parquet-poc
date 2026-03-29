@@ -7,16 +7,16 @@
 - **WHEN** `generateTransactions` is called with a config spanning Jan 2024 – Dec 2025
 - **THEN** exactly 24 batches are yielded, one per month in chronological order
 
-#### Scenario: Each batch contains the expected number of transactions
-- **WHEN** config has `numUsers: 10`, `accountsPerUser: 2`, `transactionsPerAccountPerMonth: 5`, no churn, no seasonality
-- **THEN** each batch contains approximately 10 × 2 × 5 transactions (within ±20% due to log-normal distribution)
+#### Scenario: Each batch contains a realistic number of transactions
+- **WHEN** config has `numUsers: 100`, `transactionsPerAccountPerMonth: 85`, no churn, no seasonality override
+- **THEN** each batch contains a non-zero number of transactions consistent with the variable account counts drawn for those users
 
 #### Scenario: Generator is deterministic with the same seed
 - **WHEN** `generateTransactions` is called twice with identical configs including the same `seed`
 - **THEN** both runs produce identical `transaction_id`, `amount`, `category` values in the same order
 
 ### Requirement: Stable account IDs across months
-Account IDs SHALL be pre-generated once at generator startup and reused across all monthly batches. The same `user_id` SHALL always have the same set of `account_id` values regardless of which month is being generated.
+Account IDs SHALL be pre-generated once at generator startup using a global monotonic counter and reused across all monthly batches. The same `user_id` SHALL always have the same set of `account_id` values regardless of which month is being generated.
 
 #### Scenario: Account IDs are stable across partitions
 - **WHEN** batches for January 2024 and June 2024 are collected for user `user_0001`
@@ -78,12 +78,11 @@ The generator SHALL support a `churnRate` config parameter (0.0–1.0). When non
 | Variable | Config field |
 |---|---|
 | `NUM_USERS` | `numUsers` |
-| `ACCOUNTS_PER_USER` | `accountsPerUser` |
 | `TX_PER_ACCOUNT` | `transactionsPerAccountPerMonth` |
 | `SEED` | `seed` |
 | `CHURN_RATE` | `churnRate` |
 
-Invalid values SHALL be ignored with a warning logged to stderr. Missing variables SHALL fall back to `DEFAULT_CONFIG` values.
+`ACCOUNTS_PER_USER` SHALL NOT be supported. Invalid values SHALL be ignored with a warning logged to stderr. Missing variables SHALL fall back to `DEFAULT_CONFIG` values.
 
 #### Scenario: TX_PER_ACCOUNT overrides default
 - **WHEN** `TX_PER_ACCOUNT=850 node pipeline/dist/index.js` is run

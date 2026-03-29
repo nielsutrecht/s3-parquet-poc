@@ -28,19 +28,18 @@ function parseEnvFloat(key: string, fallback: number): number {
 async function main(): Promise<void> {
   const config: GeneratorConfig = {
     ...DEFAULT_CONFIG,
-    numUsers:                      parseEnvInt("NUM_USERS",        DEFAULT_CONFIG.numUsers),
-    accountsPerUser:               parseEnvInt("ACCOUNTS_PER_USER", DEFAULT_CONFIG.accountsPerUser),
-    transactionsPerAccountPerMonth: parseEnvInt("TX_PER_ACCOUNT",   DEFAULT_CONFIG.transactionsPerAccountPerMonth),
-    seed:                          parseEnvInt("SEED",              DEFAULT_CONFIG.seed),
-    churnRate:                     parseEnvFloat("CHURN_RATE",      DEFAULT_CONFIG.churnRate ?? 0),
+    numUsers:                      parseEnvInt("NUM_USERS",      DEFAULT_CONFIG.numUsers),
+    transactionsPerAccountPerMonth: parseEnvInt("TX_PER_ACCOUNT", DEFAULT_CONFIG.transactionsPerAccountPerMonth),
+    seed:                          parseEnvInt("SEED",            DEFAULT_CONFIG.seed),
+    churnRate:                     parseEnvFloat("CHURN_RATE",    DEFAULT_CONFIG.churnRate ?? 0),
   };
 
-  const envOverrides = ["NUM_USERS", "ACCOUNTS_PER_USER", "TX_PER_ACCOUNT", "SEED", "CHURN_RATE"]
+  const envOverrides = ["NUM_USERS", "TX_PER_ACCOUNT", "SEED", "CHURN_RATE"]
     .filter(k => process.env[k] !== undefined);
 
   console.log("Starting transaction generation...");
   console.log(
-    `Config: ${config.numUsers} users × ${config.accountsPerUser} accounts × ~${config.transactionsPerAccountPerMonth} tx/account/month × 24 months`
+    `Config: ${config.numUsers} users × ~${config.transactionsPerAccountPerMonth} tx/account/month × 24 months (account count varies by archetype)`
   );
   if (config.churnRate) console.log(`Churn rate: ${config.churnRate}`);
   if (envOverrides.length) console.log(`Env overrides: ${envOverrides.join(", ")}`);

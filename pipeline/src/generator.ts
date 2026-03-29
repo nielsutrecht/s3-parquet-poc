@@ -214,6 +214,26 @@ const SEASONAL_MULTIPLIERS: Record<number, number> = {
 };
 
 // ---------------------------------------------------------------------------
+// Account count distribution per archetype
+// ---------------------------------------------------------------------------
+
+const ACCOUNTS_DISTRIBUTION: Record<string, Array<{ count: number; weight: number }>> = {
+  low:  [{ count: 1, weight: 50 }, { count: 2, weight: 30 }, { count: 3, weight: 15 }, { count: 4, weight: 5 }],
+  mid:  [{ count: 2, weight: 20 }, { count: 3, weight: 35 }, { count: 4, weight: 25 }, { count: 5, weight: 15 }, { count: 6, weight: 5 }],
+  high: [{ count: 3, weight: 10 }, { count: 4, weight: 20 }, { count: 5, weight: 25 }, { count: 6, weight: 20 }, { count: 7, weight: 15 }, { count: 8, weight: 10 }],
+};
+
+function drawAccountCount(archetype: UserArchetype, rng: ReturnType<typeof createPrng>): number {
+  const dist = ACCOUNTS_DISTRIBUTION[archetype.name];
+  let roll = rng.nextFloat() * dist.reduce((s, e) => s + e.weight, 0);
+  for (const { count, weight } of dist) {
+    roll -= weight;
+    if (roll < 0) return count;
+  }
+  return dist[dist.length - 1].count;
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -296,7 +316,6 @@ export async function* generateTransactions(
 ): AsyncGenerator<GeneratorBatch> {
   const {
     numUsers,
-    accountsPerUser,
     transactionsPerAccountPerMonth,
     seed,
     startYear,
@@ -317,16 +336,20 @@ export async function* generateTransactions(
     churnAfterIndex: number | null; // month index (0-based) after which user is inactive
   }> = [];
 
+  let globalAccountIndex = 0;
+
   for (let u = 0; u < numUsers; u++) {
     const userId = `user_${pad(u)}`;
     const archetype = ARCHETYPES[u % ARCHETYPES.length];
+    const accountCount = drawAccountCount(archetype, rng);
     const accounts = [];
-    for (let a = 0; a < accountsPerUser; a++) {
-      const accountId = `acc_${pad(u * accountsPerUser + a)}`;
+    for (let a = 0; a < accountCount; a++) {
+      const accountId = `acc_${pad(globalAccountIndex)}`;
       const iban = randomIban(rng);
       // Stable subscription day per account: between 5th and 28th
-      const subscriptionDay = 5 + (u * accountsPerUser + a) % 24;
+      const subscriptionDay = 5 + globalAccountIndex % 24;
       accounts.push({ accountId, iban, subscriptionDay });
+      globalAccountIndex++;
     }
     const churns = churnRate > 0 && rng.nextFloat() < churnRate;
     const churnAfterIndex = churns ? rng.nextInt(0, numMonths - 2) : null;
@@ -439,7 +462,6 @@ export async function* generateTransactions(
 
 export const DEFAULT_CONFIG: GeneratorConfig = {
   numUsers: 100,
-  accountsPerUser: 10,
   transactionsPerAccountPerMonth: 85,
   seed: 42,
   startYear: 2024,

@@ -13,7 +13,6 @@ export interface Transaction {
 
 export interface GeneratorConfig {
   numUsers: number;
-  accountsPerUser: number;
   transactionsPerAccountPerMonth: number;
   seed: number;
   startYear: number;

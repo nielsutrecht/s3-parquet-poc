@@ -64,7 +64,7 @@ npm run build --workspace=pipeline
 node --env-file=.env pipeline/dist/index.js
 ```
 
-Default config: 100 users × 10 accounts × ~85 tx/account/month × 24 months ≈ 2M rows.
+Default config: 100 users × ~3.5 accounts/user (varies by archetype) × ~85 tx/account/month × 24 months ≈ 700K rows.
 
 ### Environment variables
 
@@ -74,7 +74,6 @@ Set in `.env` (copy from `.env.example`). All pipeline vars are optional — def
 |---|---|---|
 | `BUCKET_NAME` | — | S3 bucket to write Parquet files to (required) |
 | `NUM_USERS` | `100` | Number of synthetic users |
-| `ACCOUNTS_PER_USER` | `10` | Accounts per user |
 | `TX_PER_ACCOUNT` | `85` | Base transactions per account per month (seasonal multiplier applied on top) |
 | `SEED` | `42` | PRNG seed — same seed = identical output |
 | `CHURN_RATE` | `0` | Fraction of users (0.0–1.0) that go inactive partway through the date range |
@@ -83,6 +82,12 @@ Full-scale run (~20M rows / ~1 GB Parquet):
 
 ```bash
 node --env-file=.env pipeline/dist/index.js
+```
+
+To delete only the S3 data (e.g. before a regeneration run) without tearing down infra:
+
+```bash
+aws s3 rm s3://<bucket>/transactions/ --recursive
 ```
 
 ### Generator behaviour
@@ -123,7 +128,7 @@ GROUP BY user_id
 ORDER BY num_accounts DESC;
 ```
 
-Expected with default config (`accountsPerUser=10`): every user has `10` accounts.
+Account counts vary by archetype: low income 1–4, mid income 2–6, high income 3–8.
 
 **`03_amount_stats.sql` — overall amount statistics**
 
@@ -223,7 +228,7 @@ SELECT
 FROM accounts_per_user
 ```
 
-Plus a top-5 users by account count. With default config (`accountsPerUser=10`) min/max/avg are all 10.
+Plus a top-5 users by account count. With default config, min/max/avg reflect the archetype distribution (low: 1–4, mid: 2–6, high: 3–8).
 
 **Query 3 — overall amount statistics**
 
