@@ -29,7 +29,7 @@ queries/
 ## Prerequisites
 
 - Node.js 22+ (`.nvmrc` pins v22; any newer version works)
-- Python 3 + `pip`
+- Python 3 + `pip3`
 - AWS credentials configured (`~/.aws` or environment variables)
 - [Pulumi CLI](https://www.pulumi.com/docs/install/)
 
@@ -82,7 +82,7 @@ Set in `.env` (copy from `.env.example`). All pipeline vars are optional — def
 Full-scale run (~20M rows / ~1 GB Parquet):
 
 ```bash
-TX_PER_ACCOUNT=850 node --env-file=.env pipeline/dist/index.js
+node --env-file=.env pipeline/dist/index.js
 ```
 
 ### Generator behaviour
@@ -168,14 +168,15 @@ Results are written to `s3://<bucket>/athena-results/` and retrievable with `aws
 ### Setup
 
 ```bash
-pip install -r queries/requirements.txt
+python3 -m venv queries/.venv
+queries/.venv/bin/pip install -r queries/requirements.txt
 ```
 
 ### Running
 
 ```bash
 set -a && source .env && set +a
-python queries/duckdb.py
+queries/.venv/bin/python queries/duckdb.py
 ```
 
 Requires AWS credentials in `~/.aws/credentials` or the standard `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_SESSION_TOKEN` environment variables. DuckDB picks them up automatically via the credential chain.

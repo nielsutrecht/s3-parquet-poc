@@ -10,6 +10,9 @@ dist/
 # Pulumi state
 .pulumi/
 
+# Python virtual environments
+.venv/
+
 # Environment variables
 .env
 .env.local
