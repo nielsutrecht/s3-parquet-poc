@@ -20,6 +20,7 @@ export interface GeneratorConfig {
   startMonth: number;
   endYear: number;
   endMonth: number;
+  churnRate?: number; // 0.0–1.0; fraction of users that go inactive partway through
 }
 
 export interface CategoryProfile {
@@ -30,6 +31,12 @@ export interface CategoryProfile {
   counterparties: string[];
 }
 
+export interface RecurringProfile {
+  minAmount: number;
+  maxAmount: number;
+  counterparties: string[];
+}
+
 export interface UserArchetype {
   name: string;
   salaryMin: number;
@@ -37,6 +44,8 @@ export interface UserArchetype {
   txPerAccountMin: number;
   txPerAccountMax: number;
   categories: Record<string, CategoryProfile>;
+  recurringRent: RecurringProfile;
+  recurringSubscription: RecurringProfile;
 }
 
 export type AnonymizedTransaction = Omit<Transaction, "counterparty">;

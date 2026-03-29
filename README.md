@@ -65,7 +65,32 @@ node pipeline/dist/index.js
 ```
 
 Default config: 100 users × 10 accounts × ~85 tx/account/month × 24 months ≈ 2M rows.
-Full-scale run (~20M rows) requires bumping `transactionsPerAccountPerMonth` to ~850 in `pipeline/src/generator.ts`.
+
+### Environment variables
+
+Override config at runtime without editing source:
+
+| Variable | Default | Description |
+|---|---|---|
+| `NUM_USERS` | `100` | Number of synthetic users |
+| `ACCOUNTS_PER_USER` | `10` | Accounts per user |
+| `TX_PER_ACCOUNT` | `85` | Base transactions per account per month (seasonal multiplier applied on top) |
+| `SEED` | `42` | PRNG seed — same seed = identical output |
+| `CHURN_RATE` | `0` | Fraction of users (0.0–1.0) that go inactive partway through the date range |
+
+Full-scale run (~20M rows / ~1 GB Parquet):
+
+```bash
+TX_PER_ACCOUNT=850 node pipeline/dist/index.js
+```
+
+### Generator behaviour
+
+- **3 user archetypes** — low / mid / high income, assigned round-robin
+- **Seasonal spend** — transaction counts scaled by month (December ×1.3, January ×0.8)
+- **Recurring transactions** — rent on day 1, subscriptions on a stable per-account day each month
+- **Log-normal amounts** — realistic long tail; most transactions are small, occasional larger ones
+- **Churn** — users with a cutoff month produce no transactions after it (`CHURN_RATE=0` by default)
 
 ## Athena queries
 
