@@ -28,7 +28,7 @@ queries/
 
 ## Prerequisites
 
-- Node.js 22 (see `.nvmrc`)
+- Node.js 22+ (`.nvmrc` pins v22; any newer version works)
 - Python 3 + `pip`
 - AWS credentials configured (`~/.aws` or environment variables)
 - [Pulumi CLI](https://www.pulumi.com/docs/install/)
@@ -36,7 +36,6 @@ queries/
 ## Setup
 
 ```bash
-nvm use          # switch to Node 22
 npm install      # install all workspace dependencies
 ```
 

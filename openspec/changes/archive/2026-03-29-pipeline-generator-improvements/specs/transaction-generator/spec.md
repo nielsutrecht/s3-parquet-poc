@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Batch async generator interface
 `pipeline/src/generator.ts` SHALL export a `generateTransactions(config: GeneratorConfig)` async generator function that yields objects of shape `{ year: number, month: number, transactions: Transaction[] }` — one batch per calendar month from `startYear/startMonth` through `endYear/endMonth` inclusive. Users with an active churn cutoff SHALL be excluded from batches after their cutoff month.

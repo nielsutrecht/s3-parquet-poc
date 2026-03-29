@@ -36,7 +36,7 @@ PULUMI_CONFIG_PASSPHRASE="" pulumi destroy
 
 - **TypeScript strict + NodeNext modules** — all workspaces extend root `tsconfig.json`
 - **ESLint 9 flat config** (`eslint.config.mjs`) — `@typescript-eslint/recommended`
-- **Node 22 LTS** — pinned in `.nvmrc`
+- **Node 22+ LTS** — `.nvmrc` pins v22; any newer version works
 - **npm workspaces** — no Turborepo; workspaces are independent leaf nodes
 - **mulberry32 PRNG** — seeded, deterministic; no external dep
 - **Pulumi local backend** — `file://~`; `Pulumi.*.yaml` is gitignored
