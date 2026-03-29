@@ -250,6 +250,21 @@ Query 4: Amount statistics per year/month (chronological)
 24 rows
 ```
 
+## Dashboarding options
+
+The data is queryable via Athena or DuckDB — several tools connect naturally to either.
+
+| Tool | Connects to | Notes |
+|---|---|---|
+| **Amazon QuickSight** | Athena | Native integration, no extra infra. SPICE caches data for fast dashboards. ~$24/month per author. |
+| **Grafana** | Athena | Athena data source plugin available. Free tier covers light usage. Good for time-series style charts. |
+| **Metabase** | DuckDB / Athena | Easy to self-host via Docker. DuckDB driver available as a community plugin. Low barrier to entry. |
+| **Apache Superset** | Athena | Docker-friendly, native Athena support via `PyAthena`. More powerful but more setup than Metabase. |
+| **Evidence** | DuckDB / Athena | Markdown + SQL → static report site. Minimal overhead, fits a PoC well, output is shareable. |
+| **Jupyter + plotly** | DuckDB (local) | Zero extra infra. `pip install jupyter plotly` and reuse the DuckDB query patterns from `queries/duckdb.py`. |
+
+For a local-first PoC, **Jupyter + DuckDB** is the lowest-friction starting point. If you want something shareable, **Evidence** is a good fit. If Athena is provisioned and you want a full BI tool, **QuickSight** is the path of least resistance within AWS.
+
 ## Development
 
 ```bash
