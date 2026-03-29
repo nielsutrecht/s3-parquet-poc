@@ -36,7 +36,8 @@ queries/
 ## Setup
 
 ```bash
-npm install      # install all workspace dependencies
+cp .env.example .env   # copy and fill in BUCKET_NAME after deploying infra
+npm install            # install all workspace dependencies
 ```
 
 ## Infra
@@ -60,17 +61,18 @@ PULUMI_CONFIG_PASSPHRASE="" pulumi destroy
 
 ```bash
 npm run build --workspace=pipeline
-node pipeline/dist/index.js
+node --env-file=.env pipeline/dist/index.js
 ```
 
 Default config: 100 users × 10 accounts × ~85 tx/account/month × 24 months ≈ 2M rows.
 
 ### Environment variables
 
-Override config at runtime without editing source:
+Set in `.env` (copy from `.env.example`). All pipeline vars are optional — defaults are used if unset.
 
 | Variable | Default | Description |
 |---|---|---|
+| `BUCKET_NAME` | — | S3 bucket to write Parquet files to (required) |
 | `NUM_USERS` | `100` | Number of synthetic users |
 | `ACCOUNTS_PER_USER` | `10` | Accounts per user |
 | `TX_PER_ACCOUNT` | `85` | Base transactions per account per month (seasonal multiplier applied on top) |
@@ -80,7 +82,7 @@ Override config at runtime without editing source:
 Full-scale run (~20M rows / ~1 GB Parquet):
 
 ```bash
-TX_PER_ACCOUNT=850 node pipeline/dist/index.js
+TX_PER_ACCOUNT=850 node --env-file=.env pipeline/dist/index.js
 ```
 
 ### Generator behaviour
@@ -172,7 +174,8 @@ pip install -r queries/requirements.txt
 ### Running
 
 ```bash
-BUCKET_NAME=transactions-037bac4 python queries/duckdb.py
+set -a && source .env && set +a
+python queries/duckdb.py
 ```
 
 Requires AWS credentials in `~/.aws/credentials` or the standard `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_SESSION_TOKEN` environment variables. DuckDB picks them up automatically via the credential chain.

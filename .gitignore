@@ -12,7 +12,8 @@ dist/
 
 # Environment variables
 .env
-.env.*
+.env.local
+.env.*.local
 
 # OS artifacts
 .DS_Store
